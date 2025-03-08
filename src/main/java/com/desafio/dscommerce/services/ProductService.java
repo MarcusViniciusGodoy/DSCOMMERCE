@@ -1,6 +1,5 @@
 package com.desafio.dscommerce.services;
 
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,6 @@ import com.desafio.dscommerce.repositories.ProductRepository;
 import com.desafio.dscommerce.services.exceptions.DatabaseException;
 import com.desafio.dscommerce.services.exceptions.ResourceNotFoundException;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
