@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 public class OrderDTO {
 
-    private Long id;
+	private Long id;
 	private Instant moment;
 	private OrderStatus status;
 	
@@ -35,11 +35,11 @@ public class OrderDTO {
 	}
 	
 	public OrderDTO(Order entity) {
-		id = entity.getId();
-		moment = entity.getMoment();
-		status = entity.getStatus();
-		client = new ClientDTO(entity.getClient());
-		payment = (entity.getPayment() == null) ? null : new PaymentDTO(entity.getPayment());
+		this.id = entity.getId();
+		this.moment = entity.getMoment();
+		this.status = entity.getStatus();
+		this.client = new ClientDTO(entity.getClient());
+		this.payment = (entity.getPayment() == null) ? null : new PaymentDTO(entity.getPayment());
 		for (OrderItem item : entity.getItems()) {
 			OrderItemDTO itemDto = new OrderItemDTO(item);
 			items.add(itemDto);
@@ -78,3 +78,4 @@ public class OrderDTO {
 		return sum;
 	}
 }
+
