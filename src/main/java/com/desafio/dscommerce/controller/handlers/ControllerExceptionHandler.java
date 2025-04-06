@@ -12,7 +12,8 @@ import java.time.Instant;
  import com.desafio.dscommerce.DTO.CustomError;
  import com.desafio.dscommerce.DTO.ValidationError;
  import com.desafio.dscommerce.services.exceptions.DatabaseException;
- import com.desafio.dscommerce.services.exceptions.ResourceNotFoundException;
+import com.desafio.dscommerce.services.exceptions.ForbiddenException;
+import com.desafio.dscommerce.services.exceptions.ResourceNotFoundException;
  
  import jakarta.servlet.http.HttpServletRequest;
  
@@ -42,4 +43,11 @@ import java.time.Instant;
          }
          return ResponseEntity.status(status).body(err);
      }
+
+     @ExceptionHandler(ForbiddenException.class)
+     public ResponseEntity<CustomError> forbidden(ForbiddenException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
  }
