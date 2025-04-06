@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.desafio.dscommerce.DTO.OrderDTO;
-import com.desafio.dscommerce.DTO.ProductDTO;
 import com.desafio.dscommerce.services.OrderService;
 
 import jakarta.validation.Valid;
@@ -33,7 +32,7 @@ public class OrderController {
         return ResponseEntity.ok(dto);
     }
     
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
     @PostMapping
     public ResponseEntity<OrderDTO> insert(@Valid @RequestBody OrderDTO dto) {
         dto = service.insert(dto);

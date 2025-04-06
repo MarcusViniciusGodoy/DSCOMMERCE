@@ -4,7 +4,7 @@ import com.desafio.dscommerce.entities.OrderItem;
 
 public class OrderItemDTO {
 
-    private Long productId;
+	private Long productId;
 	private String name;
 	private Double price;
 	private Integer quantity;
@@ -45,11 +45,11 @@ public class OrderItemDTO {
 		return quantity;
 	}
 
-	public String getImgUrl() {
-		return imgUrl;
-	}
-
 	public Double getSubTotal() {
 		return price * quantity;
+	}
+	
+	public String getImgUrl() {
+		return imgUrl;
 	}
 }
