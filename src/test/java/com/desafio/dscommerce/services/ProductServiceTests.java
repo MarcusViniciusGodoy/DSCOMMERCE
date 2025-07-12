@@ -4,6 +4,7 @@ import com.desafio.dscommerce.DTO.ProductDTO;
 import com.desafio.dscommerce.DTO.ProductMinDTO;
 import com.desafio.dscommerce.entities.Product;
 import com.desafio.dscommerce.repositories.ProductRepository;
+import com.desafio.dscommerce.services.exceptions.DatabaseException;
 import com.desafio.dscommerce.services.exceptions.ResourceNotFoundException;
 import com.desafio.dscommerce.tests.ProductFactory;
 import jakarta.persistence.EntityNotFoundException;
@@ -133,6 +134,13 @@ public class ProductServiceTests {
     public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists(){
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
             service.delete(nonExistingProductId);
+        });
+    }
+
+    @Test
+    public void deleteShouldThrowDatabaseExceptionWhenIdDoesNotExists(){
+        Assertions.assertThrows(DatabaseException.class, () -> {
+            service.delete(dependentProductId);
         });
     }
 }
