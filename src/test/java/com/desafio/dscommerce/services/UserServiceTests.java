@@ -53,4 +53,12 @@ public class UserServiceTests {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(result.getUsername(), existingUsername);
     }
+
+    @Test
+    public void loadUserByUsernameShouldThrowUserNotFoundExceptionWhenUserDoesNotExists(){
+
+        Assertions.assertThrows(UsernameNotFoundException.class, () ->{
+            service.loadUserByUsername(nonExistingUsername);
+        });
+    }
 }
