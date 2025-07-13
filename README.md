@@ -21,6 +21,10 @@ A aplicação consiste em utilizar um ambiente de testes configurado acessando o
 - Spring Boot
 - Maven
 
+## Testes Automatizados
+- JUnit5
+- JaCoCo
+
 # Autor
 Marcus Vinícius de Godoy 
 
