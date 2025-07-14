@@ -103,4 +103,16 @@ public class UserServiceTests {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(result.getEmail(), existingUsername);
     }
+
+    @Test
+    public void getMeShouldThrowUserNotFoundExceptionWhenUserNotAuthenticated(){
+
+        UserService spyUserService = Mockito.spy(service);
+        Mockito.doThrow(UsernameNotFoundException.class).when(spyUserService).authenticated();
+
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> {
+            @SuppressWarnings("unused")
+            UserDTO result = spyUserService.getMe();
+        });
+    }
 }
