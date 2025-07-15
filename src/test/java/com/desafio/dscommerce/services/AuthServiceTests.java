@@ -53,4 +53,16 @@ public class AuthServiceTests {
             service.validateSelfOrAdmin(userId);
         });
     }
+
+    @Test
+    public void validatedSelfOrAdminThrowsForbiddenExceptionWhenClientOtherLogged(){
+
+        Mockito.when(userService.authenticated()).thenReturn(selfClient);
+
+        Long userId = otherClient.getId();
+
+        Assertions.assertThrows(ForbiddenException.class, () -> {
+            service.validateSelfOrAdmin(userId);
+        });
+    }
 }
