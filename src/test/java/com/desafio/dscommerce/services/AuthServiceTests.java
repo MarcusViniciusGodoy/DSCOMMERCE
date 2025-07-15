@@ -1,6 +1,7 @@
 package com.desafio.dscommerce.services;
 
 import com.desafio.dscommerce.entities.User;
+import com.desafio.dscommerce.services.exceptions.ForbiddenException;
 import com.desafio.dscommerce.tests.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,18 @@ public class AuthServiceTests {
         Mockito.when(userService.authenticated()).thenReturn(admin);
 
         Long userId = admin.getId();
+
+        Assertions.assertDoesNotThrow(() -> {
+            service.validateSelfOrAdmin(userId);
+        });
+    }
+
+    @Test
+    public void validateSelfOrAdminShouldDoNothingWhenSelfLogged(){
+
+        Mockito.when(userService.authenticated()).thenReturn(selfClient);
+
+        Long userId = selfClient.getId();
 
         Assertions.assertDoesNotThrow(() -> {
             service.validateSelfOrAdmin(userId);
