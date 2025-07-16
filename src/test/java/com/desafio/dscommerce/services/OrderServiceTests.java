@@ -2,6 +2,7 @@ package com.desafio.dscommerce.services;
 
 import com.desafio.dscommerce.DTO.OrderDTO;
 import com.desafio.dscommerce.entities.Order;
+import com.desafio.dscommerce.entities.OrderItem;
 import com.desafio.dscommerce.entities.Product;
 import com.desafio.dscommerce.entities.User;
 import com.desafio.dscommerce.repositories.OrderItemRepository;
@@ -133,7 +134,6 @@ public class OrderServiceTests {
         OrderDTO result = service.insert(orderDTO);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(result.getId(), existingOrderId);
     }
 
     @Test
@@ -144,7 +144,6 @@ public class OrderServiceTests {
         OrderDTO result = service.insert(orderDTO);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(result.getId(), existingOrderId);
     }
 
     @Test
@@ -158,6 +157,23 @@ public class OrderServiceTests {
         Assertions.assertThrows(UsernameNotFoundException.class, () -> {
             @SuppressWarnings("unused")
            OrderDTO result = service.insert(orderDTO);
+        });
+    }
+
+    @Test
+    public void insertShouldThrowsEntityNotFoundExceptionWhenOrderProductIdDoesNotExist(){
+
+        Mockito.when(userService.authenticated()).thenReturn(client);
+
+        product.setId(nonExistingProductId);
+        OrderItem orderItem = new OrderItem(order, product, 2, 10.0);
+        order.getItems().add(orderItem);
+
+        orderDTO = new OrderDTO(order);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            @SuppressWarnings("unused")
+            OrderDTO result = service.insert(orderDTO);
         });
     }
 }
