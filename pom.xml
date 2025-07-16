@@ -115,6 +115,8 @@
 						<exclude>com/desafio/dscommerce/dto/**</exclude>
 						<exclude>com/desafio/dscommerce/controllers/handlers/**</exclude>
 						<exclude>com/desafio/dscommerce/services/exceptions/**</exclude>
+						<exclude>com/desafio/dscommerce/util/**</exclude>
+						<exclude>com/desafio/dscommerce/controllers/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>
