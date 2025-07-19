@@ -32,7 +32,7 @@ public class UserServiceTests {
     private UserRepository repository;
 
     @Mock
-    private CustomUserUtil userUtil;
+    private CustomUserUtil  userUtil;
 
     private String existingUsername, nonExistingUsername;
     private User user;
