@@ -35,6 +35,20 @@ public class ProductControllerIT {
     }
 
     @Test
+    public void findAllShouldReturnPageWhenProductNameParamIsEmpty() throws Exception {
+
+        ResultActions result =
+                mockMvc.perform(get("/products")
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.content[0].id").value(1L));
+        result.andExpect(jsonPath("$.content[0].name").value("The Lord of the Rings"));
+        result.andExpect(jsonPath("$.content[0].price").value(90.5));
+        result.andExpect(jsonPath("$.content[0].imgUrl").value("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg"));
+    }
+
+    @Test
     public void findAllShouldReturnPageWhenProductNameParamIsNotEmpty() throws Exception {
 
         ResultActions result =
