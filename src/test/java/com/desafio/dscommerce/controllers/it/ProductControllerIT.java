@@ -7,6 +7,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.desafio.dscommerce.DTO.ProductDTO;
+import com.desafio.dscommerce.entities.Category;
+import com.desafio.dscommerce.entities.Product;
+import com.desafio.dscommerce.tests.TokenUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -26,12 +30,34 @@ public class ProductControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
-    private String productName, adminToken;
+    @Autowired
+    private TokenUtil tokenUtil;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private String clientUsername, clientePassword, adminUsername, adminPassword;
+    private String productName, adminToken, clientToken, invalidToken;
+
+    private Product product;
+    private ProductDTO productDTO;
 
     @BeforeEach
     void setUp() throws Exception{
+        clientUsername = "maria@gmail.com";
+        clientePassword = "123456";
+        adminUsername = "alex@gmail.com";
+        adminPassword = "123456";
 
         productName = "Macbook";
+        adminToken = tokenUtil.obtainAccessToken(mockMvc, adminUsername, adminPassword);
+        clientToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientePassword);
+        invalidToken = adminToken + "xpto"; //simulates wrong password
+
+        Category category = new Category(2L, null);
+        product = new Product(null, "Console PlayStation 5", "Lorem ipsum dolor sit amet, consectetur adipiscing elit", 3999.90, "https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg");
+        product.getCategories().add(category);
+        productDTO = new ProductDTO(product);
     }
 
     @Test
@@ -65,7 +91,7 @@ public class ProductControllerIT {
     @Test
     public void insertShouldReturnProductDTOCreatedWhenAdminLogged() throws Exception {
 
-        String jsonBody = "";
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
 
         ResultActions result =
                 mockMvc.perform(post("/products")
