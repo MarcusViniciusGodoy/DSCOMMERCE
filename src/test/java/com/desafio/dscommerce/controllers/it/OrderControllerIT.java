@@ -99,4 +99,39 @@ public class OrderControllerIT {
 
         result.andExpect(status().isNotFound());
     }
+    
+    @Test
+    public void findByIdShouldReturnForbiddenWhenIdExistsAndClientLogged() throws Exception {
+
+        Long otherOrderId = 2L;
+
+        ResultActions result =
+                mockMvc.perform(get("/orders/{id}", otherOrderId)
+                        .header("Authorization", "Bearer " + clientToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByIdShouldReturnNotFoundWhenIdDoesNotExistAndClientLogged() throws Exception {
+
+        ResultActions result =
+                mockMvc.perform(get("/orders/{id}", nonExistingOrderId)
+                        .header("Authorization", "Bearer " + clientToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findByIdShouldReturnUnauthorizedWhenIdExistsAndInvalidToken() throws Exception {
+
+        ResultActions result =
+                mockMvc.perform(get("/orders/{id}", existingOrderId)
+                        .header("Authorization", "Bearer " + invalidToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isUnauthorized());
+    }
 }
