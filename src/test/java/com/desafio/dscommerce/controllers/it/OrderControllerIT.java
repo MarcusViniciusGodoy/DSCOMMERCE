@@ -75,15 +75,28 @@ public class OrderControllerIT {
         ResultActions result =
                 mockMvc.perform(get("/orders/{id}", existingOrderId)
                                 .header("Authorization", "Bearer " + adminToken)
-                                .accept(MediaType.APPLICATION_JSON));
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andDo(MockMvcResultHandlers.print());
 
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.id").value(existingOrderId));
         result.andExpect(jsonPath("$.moment").value("2022-07-25T13:00:00Z"));
         result.andExpect(jsonPath("$.status").value("PAID"));
         result.andExpect(jsonPath("$.client").exists());
+        result.andExpect(jsonPath("$.client.name").value("Maria Brown"));
         result.andExpect(jsonPath("$.payment").exists());
         result.andExpect(jsonPath("$.items").exists());
         result.andExpect(jsonPath("$.total").exists());
+    }
+
+    @Test
+    public void findByIdShouldReturnNotFoundWhenIdDoesNotExistAndAdminLogged() throws Exception {
+
+        ResultActions result =
+                mockMvc.perform(get("/orders/{id}", nonExistingOrderId)
+                        .header("Authorization", "Bearer " + adminToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isNotFound());
     }
 }
