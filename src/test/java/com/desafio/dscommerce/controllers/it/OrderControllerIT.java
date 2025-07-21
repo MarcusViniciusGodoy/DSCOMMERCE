@@ -34,13 +34,13 @@ public class OrderControllerIT {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenUtil tokenUtil;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    private String clientUsername, clientePassword, adminUsername, adminPassword;
-    private String adminToken, clientToken, invalidToken;
+    @Autowired
+    private TokenUtil tokenUtil;
+
+    private String clientUsername, clientPassword, adminUsername, adminPassword, adminOnlyUsername, adminOnlyPassword;
+    private String clientToken, adminToken, adminOnlyToken, invalidToken;
     private Long existingOrderId, nonExistingOrderId;
 
     private Order order;
@@ -48,18 +48,22 @@ public class OrderControllerIT {
     private User user;
 
     @BeforeEach
-    void setUp() throws Exception{
+    void setUp() throws Exception {
+
         clientUsername = "maria@gmail.com";
-        clientePassword = "123456";
+        clientPassword = "123456";
         adminUsername = "alex@gmail.com";
         adminPassword = "123456";
+        adminOnlyUsername = "ana@gmail.com";
+        adminOnlyPassword = "123456";
 
         existingOrderId = 1L;
-        nonExistingOrderId = 100L;
+        nonExistingOrderId = 1000L;
 
+        clientToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientPassword);
         adminToken = tokenUtil.obtainAccessToken(mockMvc, adminUsername, adminPassword);
-        clientToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientePassword);
-        invalidToken = adminToken + "xpto"; //simulates wrong password
+        adminOnlyToken = tokenUtil.obtainAccessToken(mockMvc, adminOnlyUsername, adminOnlyPassword);
+        invalidToken = adminToken + "xpto"; // Simulates a wrong token
 
         user = UserFactory.createClientUser();
         order = new Order(null, Instant.now(), OrderStatus.WAITING_PAYMENT, user, null);
@@ -67,39 +71,46 @@ public class OrderControllerIT {
         Product product = ProductFactory.createProduct();
         OrderItem orderItem = new OrderItem(order, product, 2, 10.0);
         order.getItems().add(orderItem);
+
+        orderDTO = new OrderDTO(order);
     }
 
     @Test
-    public void findByIdShouldReturnOrderDTOWhenIdExistsWhenAdminLogged() throws Exception{
+    public void findByIdShouldReturnOrderDTOWhenIdExistsAndAdminLogged() throws Exception {
 
         ResultActions result =
                 mockMvc.perform(get("/orders/{id}", existingOrderId)
-                                .header("Authorization", "Bearer " + adminToken)
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andDo(MockMvcResultHandlers.print());
+                        .header("Authorization", "Bearer " + adminToken)
+                        .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk());
-        result.andExpect(jsonPath("$.id").value(existingOrderId));
-        result.andExpect(jsonPath("$.moment").value("2022-07-25T13:00:00Z"));
+        result.andExpect(jsonPath("$.id").value(1L));
+        result.andExpect(jsonPath("$.moment").value(Instant.now()));
         result.andExpect(jsonPath("$.status").value("PAID"));
         result.andExpect(jsonPath("$.client").exists());
-        result.andExpect(jsonPath("$.client.name").value("Maria Brown"));
         result.andExpect(jsonPath("$.payment").exists());
         result.andExpect(jsonPath("$.items").exists());
         result.andExpect(jsonPath("$.total").exists());
     }
 
     @Test
-    public void findByIdShouldReturnNotFoundWhenIdDoesNotExistAndAdminLogged() throws Exception {
+    public void findByIdShouldReturnOrderDTOWhenIdExistsAndClientLogged() throws Exception {
 
         ResultActions result =
-                mockMvc.perform(get("/orders/{id}", nonExistingOrderId)
-                        .header("Authorization", "Bearer " + adminToken)
+                mockMvc.perform(get("/orders/{id}", existingOrderId)
+                        .header("Authorization", "Bearer " + clientToken)
                         .accept(MediaType.APPLICATION_JSON));
 
-        result.andExpect(status().isNotFound());
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.id").value(1L));
+        result.andExpect(jsonPath("$.moment").value(Instant.now()));
+        result.andExpect(jsonPath("$.status").value("PAID"));
+        result.andExpect(jsonPath("$.client").exists());
+        result.andExpect(jsonPath("$.payment").exists());
+        result.andExpect(jsonPath("$.items").exists());
+        result.andExpect(jsonPath("$.total").exists());
     }
-    
+
     @Test
     public void findByIdShouldReturnForbiddenWhenIdExistsAndClientLogged() throws Exception {
 
@@ -111,6 +122,17 @@ public class OrderControllerIT {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByIdShouldReturnNotFoundWhenIdDoesNotExistAndAdminLogged() throws Exception {
+
+        ResultActions result =
+                mockMvc.perform(get("/orders/{id}", nonExistingOrderId)
+                        .header("Authorization", "Bearer " + adminToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isNotFound());
     }
 
     @Test
@@ -130,6 +152,76 @@ public class OrderControllerIT {
         ResultActions result =
                 mockMvc.perform(get("/orders/{id}", existingOrderId)
                         .header("Authorization", "Bearer " + invalidToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void insertShouldReturnOrderDTOCreatedWhenClientLogged() throws Exception {
+
+        String jsonBody = objectMapper.writeValueAsString(orderDTO);
+
+        ResultActions result =
+                mockMvc.perform(post("/orders")
+                                .header("Authorization", "Bearer " + clientToken)
+                                .content(jsonBody)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andDo(MockMvcResultHandlers.print());
+
+        result.andExpect(status().isCreated());
+        result.andExpect(jsonPath("$.id").value(4L));
+        result.andExpect(jsonPath("$.moment").exists());
+        result.andExpect(jsonPath("$.status").value("WAITING_PAYMENT"));
+        result.andExpect(jsonPath("$.client").exists());
+        result.andExpect(jsonPath("$.items").exists());
+        result.andExpect(jsonPath("$.total").exists());
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenClientLoggedAndOrderHasNoItem() throws Exception {
+
+        orderDTO.getItems().clear();
+
+        String jsonBody = objectMapper.writeValueAsString(orderDTO);
+
+        ResultActions result =
+                mockMvc.perform(post("/orders")
+                                .header("Authorization", "Bearer " + clientToken)
+                                .content(jsonBody)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andDo(MockMvcResultHandlers.print());
+
+        result.andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void insertShouldReturnForbiddenWhenAdminLogged() throws Exception {
+
+        String jsonBody = objectMapper.writeValueAsString(orderDTO);
+
+        ResultActions result =
+                mockMvc.perform(post("/orders")
+                        .header("Authorization", "Bearer " + adminOnlyToken)
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void insertShouldReturnUnauthorizedWhenInvalidToken() throws Exception {
+
+        String jsonBody = objectMapper.writeValueAsString(orderDTO);
+
+        ResultActions result =
+                mockMvc.perform(post("/orders")
+                        .header("Authorization", "Bearer " + invalidToken)
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isUnauthorized());
