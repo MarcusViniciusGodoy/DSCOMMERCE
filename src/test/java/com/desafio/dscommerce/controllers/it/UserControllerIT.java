@@ -55,4 +55,21 @@ public class UserControllerIT {
         result.andExpect(jsonPath("$.birthDate").value("1987-12-13"));
         result.andExpect(jsonPath("$.roles").exists());
     }
+
+    @Test
+    public void getMeShouldReturnUserDTOWhenClientLogged() throws Exception {
+
+        ResultActions result =
+                mockMvc.perform(get("/users/me")
+                        .header("Authorization", "Bearer " + clientToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.id").value(1L));
+        result.andExpect(jsonPath("$.name").value("Maria Brown"));
+        result.andExpect(jsonPath("$.email").value("maria@gmail.com"));
+        result.andExpect(jsonPath("$.phone").value("988888888"));
+        result.andExpect(jsonPath("$.birthDate").value("2001-07-25"));
+        result.andExpect(jsonPath("$.roles").exists());
+    }
 }
