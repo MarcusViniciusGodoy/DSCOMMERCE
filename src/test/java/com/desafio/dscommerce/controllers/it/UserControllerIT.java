@@ -72,4 +72,15 @@ public class UserControllerIT {
         result.andExpect(jsonPath("$.birthDate").value("2001-07-25"));
         result.andExpect(jsonPath("$.roles").exists());
     }
+
+    @Test
+    public void getMeShouldReturnUnauthorizedWhenInvalidToken() throws Exception {
+
+        ResultActions result =
+                mockMvc.perform(get("/users/me")
+                        .header("Authorization", "Bearer " + invalidToken)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isUnauthorized());
+    }
 }
