@@ -374,6 +374,22 @@ public class ProductControllerIT {
     }
 
     @Test
+    public void updateShouldReturnUnauthorizedWhenIdExistsAndInvalidToken() throws Exception {
+
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
+
+        ResultActions result =
+                mockMvc.perform(put("/products/{id}", existingId)
+                        .header("Authorization", "Bearer " + invalidToken)
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
     public void deleteShouldReturnNoContentWhenIdExistsAndAdminLogged() throws Exception {
 
         ResultActions result =
