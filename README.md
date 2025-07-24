@@ -16,7 +16,7 @@ A aplicação consiste em utilizar um ambiente de testes configurado acessando o
 ![Client](https://github.com/MarcusViniciusGodoy/assets/blob/main/produto.PNG)
 
 ## Testes Jacoco
-![jacoco](https://github.com/MarcusViniciusGodoy/assets/blob/main/produthttps://github.com/MarcusViniciusGodoy/assets/blob/main/dscommercejacoco.PNG)
+![jacoco](https://github.com/MarcusViniciusGodoy/assets/blob/main/dscommercejacoco.PNG)
 
 # Tecnologias Utilizadas
 ## Back end
@@ -31,4 +31,4 @@ A aplicação consiste em utilizar um ambiente de testes configurado acessando o
 # Autor
 Marcus Vinícius de Godoy 
 
-https://www.linkedin.com/in/marcus-vin%C3%ADcius-godoy-15b5461a0/
+https://www.linkedin.com/in/marcusviniciusgodoy/
