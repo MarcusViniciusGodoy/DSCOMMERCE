@@ -15,6 +15,9 @@ A aplicação consiste em utilizar um ambiente de testes configurado acessando o
 ## UML
 ![Client](https://github.com/MarcusViniciusGodoy/assets/blob/main/produto.PNG)
 
+## Testes Jacoco
+![jacoco](https://github.com/MarcusViniciusGodoy/assets/blob/main/produthttps://github.com/MarcusViniciusGodoy/assets/blob/main/dscommercejacoco.PNG)
+
 # Tecnologias Utilizadas
 ## Back end
 - Java
